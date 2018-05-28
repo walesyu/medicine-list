@@ -1,10 +1,10 @@
 <template>
     <div>
         <div style="width:100%">
-            <div id="div_title" style="margin: 0 auto;width: 120px;">{presctiption_title}</div>
+            <div class="presctiption_title">{{presctiption_title}}</div>
         </div>
-        <div class="row">
-            <div class="col-sm-12" id="tool_area">
+        <div class="row" v-show="show_tools">
+            <div class="col-sm-12" >
                 <form>
                     <table class="table">
                         <thead>
@@ -31,17 +31,32 @@
                         </tbody>
                     </table>
                 </form>
-                <div class="row" style="border: solid 1px black;">
-                    <div class="col-sm-12 pull-right" id="result_area">
-                        <span v-for="row in rows" v-bind:key="row.id">
-                            {{row['material']}}
-                            <span class='value'>{{row['dose']}}</span>
-                            <span class='unit'> {{row['dose_unit']}}</span>
-                       </span>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn btn-info" @click="addItem">新增列</button>
                     </div>
-                </div>
-                <button class="btn btn-info" @click="addItem()">新增列</button>
-                <button id='btn_print' class='btn btn-primary'>印啦印啦</button>
+                    <div class="form-group">
+                        <label>每一行筆數 :</label>
+                        <select v-model="item_perline" class="form-control">
+                            <option v-for="item in 5" :value="item +1 ">{{item +1}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" @click="print" class='btn btn-primary'>印啦印啦</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row"  style="border: solid 1px black;" >
+            <div class="col-sm-11 result_area pull-right" >
+                <span :class="(index % item_perline == 0)?' ':''" v-for="(row,index) in rows" v-bind:key="row.id" >
+                        {{row['material']}}
+                        <span class='value'>{{row['dose']}}</span>
+                        <span class='unit'> {{row['dose_unit']}}</span>&nbsp;&nbsp;
+                        <br v-if="index % item_perline == item_perline-1">
+                </span>
             </div>
         </div>
     </div>
@@ -54,18 +69,19 @@ export default {
     return {
       rows: [],
       presctiption_title: 'OO中藥行用簽',
+      show_tools : true,
+      dose : 1,
+      item_perline:4,
       material : '',
-      dose : 0,
-      material : '',
-      dose_unit:'',
+      dose_unit:'錢',
       units: [
         {
           id: 1,
-          value: '兩'
+          value: '錢'
         },
         {
           id: 2,
-          value: '錢'
+          value: '兩'
         },
         {
           id: 3,
@@ -84,37 +100,73 @@ export default {
   },
   methods: {
     addItem: function(params) {
+        if(this.material =="" || this.dose=="" || this.dose_unit==""){
+            return false;
+        }
         let data = {
             material : this.material,
             dose : this.dose,
             dose_unit : this.dose_unit
         }
         this.rows.push(data);
-        console.log(this.rows);
+        this.material = '';
+        this.dose = 1;
+        this.dose_unit = '錢';
+    },
+    print: function(){
+        setTimeout(function() {
+            this.show_tools = true;
+            console.log(this.show_tools);
+        }, 1000);
+        this.show_tools = false;
+        
+        setTimeout(function() {
+             window.print();
+        }, 10);
     }
+  },mounted:function(){
+      setTimeout(function() {
+            this.show_tools = false;
+             console.log(this.show_tools);
+        }, 1000);
   }
 }
 </script>
 
 <style scoped>
-#result_area {
-  writing-mode: tb-rl;
-}
+    .result_area {
+        writing-mode: tb-rl;
+        font-size: 18pt;
+        font-family: 標楷體;
+        margin: 10px;
+  }
 
-.unit {
-  position: relative;
-  left: 10px;
-}
+  .unit {
+        position: relative;
+        left: 10px;
+        font-size: 12pt;
+        font-family: 標楷體;
+  }
 
-.value {
-  position: relative;
-  left: 10px;
-  writing-mode: lr;
-}
+  .value {
+        position: relative;
+        left: 10px;
+        writing-mode: lr;
+        font-size: 12pt;
+        font-family: 細明體;
+  }
 
-#div_title {
-  font-size: 18pt;
-  color: Red;
-  display: none;
-}
+    #div_title {
+        font-size: 18pt;
+        color: Red;
+        display: none;
+    }
+
+    .presctiption_title{
+        margin: 0 auto;
+        width: 220px;
+        color: red;
+        font-family: 標楷體;
+        font-size:20pt;
+    }
 </style>
