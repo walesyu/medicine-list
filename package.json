@@ -10,9 +10,10 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "bootstrap": "^4.0.0",
     "prettier": "^1.12.1",
     "vue": "^2.5.2",
-    "bootstrap": "^4.0.0"
+    "vue-awesome": "^3.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
