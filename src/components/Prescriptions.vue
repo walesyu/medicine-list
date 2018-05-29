@@ -4,7 +4,7 @@
             <div class="presctiption_title">{{presctiption_title}}</div>
         </div>
         <div class="row" v-show="show_tools">
-            <div class="col-sm-12" >
+            <div class="col-sm-12">
                 <form>
                     <table class="table">
                         <thead>
@@ -17,14 +17,14 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <input class='form-control' type='text' v-model="material"/>
+                                    <input class='form-control' type='text' v-model="material" />
                                 </td>
                                 <td>
                                     <input class='form-control' type='number' v-model="dose">
                                 </td>
                                 <td>
                                     <select class='form-control' v-model="dose_unit">
-                                        <option  v-for="unit in units"  v-bind:key="unit.id" :value='unit.value'>{{unit.value}}</option>
+                                        <option v-for="unit in units" v-bind:key="unit.id" :value='unit.value'>{{unit.value}}</option>
                                     </select>
                                 </td>
                             </tr>
@@ -34,7 +34,7 @@
                 <form class="form-inline">
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button type="button" class="btn btn-info" @click="addItem">新增列</button>
+                        <button type="button" class="btn btn-info" @click="addItem">增加這一味藥</button>
                     </div>
                     <div class="form-group">
                         <label>每一行筆數 :</label>
@@ -49,27 +49,37 @@
                 </form>
             </div>
         </div>
-        <div class="row"  style="border: solid 1px black;" >
-            <div class="col-sm-11 result_area pull-right" >
-                <span :class="(index % item_perline == 0)?' ':''" v-for="(row,index) in rows" v-bind:key="row.id" >
-                        {{row['material']}}
-                        <span class='value'>{{row['dose']}}</span>
-                        <span class='unit'> {{row['dose_unit']}}</span>&nbsp;&nbsp;
-                        <br v-if="index % item_perline == item_perline-1">
+        <div class="row">
+            <div class="col-sm-11 result_area pull-right">
+                <span v-for="(row,index) in rows" v-bind:key="row.id">
+                    {{row['material']}}
+                    <span class='value'>{{row['dose']}}</span>
+                    <span class='unit'> {{row['dose_unit']}}</span>&nbsp;&nbsp;
+                    <br v-if="index % item_perline == item_perline-1">
                 </span>
             </div>
         </div>
+        <Modal :title="modal_title" :content="modal_content" :showModal="showModal">
+        </Modal>
     </div>
 </template>
 
 <script>
+import Modal from './Modal'
+
 export default {
   name: 'Prescriptions',
+  components:{
+    Modal
+  },
   data () {
     return {
       rows: [],
       presctiption_title: 'OO中藥行用簽',
+      modal_title:'注意',
+      modal_content:'',
       show_tools : true,
+      showModal: false ,
       dose : 1,
       item_perline:4,
       material : '',
@@ -101,6 +111,9 @@ export default {
   methods: {
     addItem: function(params) {
         if(this.material =="" || this.dose=="" || this.dose_unit==""){
+            this.showModal = true;
+            Modal.showModal = true;
+            this.modal_content = "沒有填入藥材名稱！";
             return false;
         }
         let data = {
@@ -114,21 +127,21 @@ export default {
         this.dose_unit = '錢';
     },
     print: function(){
-        setTimeout(function() {
-            this.show_tools = true;
-            console.log(this.show_tools);
-        }, 1000);
+        let that = this;
         this.show_tools = false;
         
         setTimeout(function() {
              window.print();
         }, 10);
-    }
-  },mounted:function(){
-      setTimeout(function() {
-            this.show_tools = false;
-             console.log(this.show_tools);
+        
+        setTimeout(function() {
+            that.show_tools = true;
         }, 1000);
+    },    
+    closeModal: function(p){
+        console.log(111);
+        this.showModal = false;
+    }
   }
 }
 </script>
