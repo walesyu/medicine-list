@@ -1,21 +1,19 @@
-# medicine_list
+# 可以用來列印中醫藥單的橫向列印工具
 
-> print medicine list
+> 使用vuejs開發
 
-## Build Setup
+## 部屬方式
 
 ``` bash
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
+# 本地端執行測試
 npm run dev
 
-# build for production with minification
+# 打包上傳主機
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+0.1 版只能直印，預計0.2版增加橫印
+0.x 版或許會加上刪除功能
