@@ -1,5 +1,5 @@
 <template>
-    <transition name="modal" v-if="show_modal">
+    <transition name="modal" v-if="show_me">
         <div class="modal" style="display: block" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -13,7 +13,7 @@
                         {{content}}
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-info" @click="closeModal"> 關閉 </button>
+                        <button type="button" class="btn btn-outline-info" @click="close_modal"> 關閉 </button>
                     </div>
                 </div>
             </div>
@@ -29,21 +29,25 @@
         components:{
             Icon
         },
-        props: ["title", "content", "showModal"],
+        props: {
+            title: String,
+            content: String,
+            show_modal: Boolean
+        },
         data: function () {
             return {
-                show_modal: this.showModal
+                show_me: this.showModal
             }
         },
         watch:{
-            showModal:function(newVal, oldVal){
-                this.show_modal = newVal;
+            show_modal:function(newVal, oldVal){
+                this.show_me = newVal;
             }
         },
         methods: {
-            closeModal: function () {
-                this.$emit("childCloseModal", false);
-                this.show_modal = false;
+            close_modal: function () {
+                this.$emit("child_close_modal", false);
+                this.show_me = false;
             }
         }
     }
