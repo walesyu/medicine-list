@@ -29,48 +29,36 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>名稱 </th>
-                                            <th>劑量 </th>
-                                            <th>單位</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input class='form-control' type='text' v-model="presctiption.material" />
-                                            </td>
-                                            <td>
-                                                <input class='form-control' type='number' v-model="presctiption.dose">
-                                            </td>
-                                            <td>
-                                                <select class='form-control' v-model="presctiption.dose_unit">
-                                                    <option v-for="unit in units" v-bind:key="unit.id" :value='unit.value'>{{unit.value}}</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <label>名稱 :</label>
+                                <input class='form-control' type='text' v-model="presctiption.material" />
+                            </div>
+                            <div class="form-group">
+                                <label>劑量 :</label>
+                                <input class='form-control' type='number' v-model="presctiption.dose">
+                            </div>
+                             <div class="form-group">
+                                <label>單位 :</label>
+                                    <select class='form-control' v-model="presctiption.dose_unit">
+                                        <option v-for="unit in units" v-bind:key="unit.id" :value='unit.value'>{{unit.value}}</option>
+                                    </select>
                             </div>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-info" @click="addItem"><icon name="plus" ></icon>&nbsp;增加這一味藥</button>
-                                <button type="button" @click="print" class='btn btn-primary'><icon name="print" ></icon>&nbsp;印啦印啦</button>
+                                <button type="button" @click="addItem" class="btn btn-info">增加這一味藥</button>
+                                <button type="button" @click="print" class='btn btn-primary'>列印</button>
+                                <button type="button" @click="clear" class='btn btn-danger'>清除藥單</button>                                
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            <div :class="(show_tools)?'col-md-5 col-sm-12':'col-md-12 col-sm-12'">
+            <div :class="(show_tools)?'col-md-6 col-sm-12':'col-md-12 col-sm-12'">
                 <div class="card">
                     <div class="card-body result_area pull-right" :class="(direction_mode==0)?'direction':''">
-                        <span v-for="(row, index) in rows" v-bind:key="row.id">
+                        <span v-for="(row, index) in rows" v-bind:key="row.id"  class="del_link" v-on:click="del_item(row)">
                             <span>{{row['material']}}</span>
                             <span class='value'>{{row['dose']}}</span>
-                            <span class='unit'> {{row['dose_unit']}}</span>
+                            <span class='unit'> {{row['dose_unit']}}</span>&nbsp;&nbsp;
                             <br v-if="index % item_perline == item_perline-1">
-                            <a v-show="show_tools" href="#" class="del_link" v-on:click="del_item(row)"><icon name="trash" ></icon></a>&nbsp;&nbsp;
                         </span>
                     </div>
                 </div>
@@ -171,6 +159,13 @@
                         }
                     }
                 }
+            },
+            clear: function(){
+                this.presctiption.material = '';
+                this.presctiption.dose = 1;
+                this.presctiption.dose_unit = '錢';
+                this.presctiption.count = 0 ;
+                this.rows = [] ;
             }
         }
     }
@@ -217,6 +212,6 @@
     }
 
     .del_link{
-        color:red;
+        cursor: pointer;
     }
 </style>
