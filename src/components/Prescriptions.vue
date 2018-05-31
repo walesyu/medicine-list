@@ -148,13 +148,13 @@
                 this.presctiption.count++;
             },
             print: function () {
-                show_tools = false;
-                let show_tools = this.show_tools;
+                let that = this;
+                this.show_tools = false;
                 setTimeout(function () {
                     window.print();
                 }, 10);
                 setTimeout(function () {
-                    show_tools = true;
+                    that.show_tools = true;
                 }, 1000);
             },
             close_modal: function () {
