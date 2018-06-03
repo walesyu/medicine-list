@@ -1,71 +1,68 @@
 <template>
     <div>
-        <div style="width:100%">
-            <div class="presctiption_title">{{presctiption_title}}</div>
-        </div>
-        <div class="row" v-show="show_tools">
-            <div class="col-sm-12">
-                <form>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>名稱 </th>
-                                <th>劑量 </th>
-                                <th>單位</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <input class='form-control' type='text' v-model="material" />
-                                </td>
-                                <td>
-                                    <input class='form-control' type='number' v-model="dose">
-                                </td>
-                                <td>
-                                    <select class='form-control' v-model="dose_unit">
-                                        <option v-for="unit in units" v-bind:key="unit.id" :value='unit.value'>{{unit.value}}</option>
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
-                <form class="form-inline">
-                    <div class="form-group">
-                        <label>&nbsp;</label>
-                        <button type="button" class="btn btn-info" @click="addItem">增加這一味藥</button>
+        <el-container>
+            <el-header class="presctiption_title">
+                {{presctiption_title}}
+            </el-header>
+        </el-container>
+        <el-container>
+            <el-aside v-show="show_tools" style="width:390px;">
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>藥單設定</span>
                     </div>
-                    <div class="form-group">
-                        <label>藥單名稱 :</label>
-                        <input type="text" v-model="presctiption_title" />
-                        <label>每一行筆數 :</label>
-                        <select v-model="item_perline" class="form-control">
-                            <option v-for="item in 5" :value="item +1 " v-bind:key="item">{{item +1}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" @click="print" class='btn btn-primary'>印啦印啦</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-11 result_area pull-right">
-                <span v-for="(row,index) in rows" v-bind:key="row.id">
+                    <el-form ref="form" label-width="100px">
+                        <el-form-item label="藥單名稱">
+                            <el-input v-model="presctiption_title" placeholder="藥單名稱"></el-input>
+                            </el-form-item>
+                            <el-form-item label="每一行筆數">
+                                <el-select v-model="item_perline" placeholder="每一行筆數">
+                                    <el-option v-for="item in 5" :key="item + 1" :label="item + 1" :value="item + 1"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="排版方式">
+                                <el-select v-model="direction_mode" placeholder="排版方式" >
+                                    <el-option :key="0" label="直印" value="0"></el-option>
+                                    <el-option :key="1" label="橫印" value="1"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="名稱">
+                                <el-select v-model="presctiption.material" placeholder="名稱" filterable allow-create no-data-text="No Data">
+                                    <el-option v-for="item in medicines" :key="item" :label="item" :value="item"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="劑量">
+                                <el-input-number v-model="presctiption.dose" :step="1"></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="單位">
+                                <el-select v-model="presctiption.dose_unit" placeholder="每一行筆數">
+                                    <el-option v-for="unit in units" :key="unit.id" :label="unit.value" :value="unit.value"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-button-group>
+                                <el-button @click="addItem" type="info" class="el-icon-plus">新增</el-button>
+                                <el-button @click="print" type="primary" class="el-icon-printer">列印</el-button>
+                                <el-button @click="clear" type="danger" class="el-icon-delete">清除藥單</el-button>
+                            </el-button-group>
+                    </el-form>
+                </el-card>
+            </el-aside>
+            <el-main class="result_area pull-right" :class="(direction_mode=='0')?'direction':''">
+                <span v-for="(row, index) in rows" v-bind:key="row.id" class="del_link" v-on:click="del_item(row)">
                     <span>{{row['material']}}</span>
                     <span class='value'>{{row['dose']}}</span>
                     <span class='unit'> {{row['dose_unit']}}</span>&nbsp;&nbsp;
                     <br v-if="index % item_perline == item_perline-1">
                 </span>
-            </div>
-        </div>
-        <Modal :title="modal_title" :content="modal_content" :showModal="showModal" @childCloseModal="close_modal" />
+            </el-main>
+            <Modal :title="modal_title" :content="modal_content" :show_modal="show_modal" @child_close_modal="close_modal" />
+        </el-container>
     </div>
 </template>
 
 <script>
     import Modal from './Modal'
+
     export default {
         name: 'Prescriptions',
         components: {
@@ -75,14 +72,18 @@
             return {
                 rows: [],
                 presctiption_title: 'OO中藥行用簽',
+                direction_mode: "0",
                 modal_title: '注意',
                 modal_content: '',
                 show_tools: true,
-                showModal: false,
-                dose: 1,
+                show_modal: false,
                 item_perline: 4,
-                material: '',
-                dose_unit: '錢',
+                presctiption:{
+                    material: '',
+                    dose_unit: '錢',
+                    dose: 1,
+                    count: 0
+                },
                 units: [{
                     id: 1,
                     value: '錢'
@@ -102,27 +103,28 @@
                 {
                     id: 5,
                     value: '枚'
-                }
-                ]
+                }],
+                medicines:["丁香","白芍","紅芍","銹鐵棒","薄荷"]
             };
         },
         methods: {
             addItem: function (params) {
-                if (this.material == "" || this.dose == "" || this.dose_unit == "") {
-                    this.showModal = true;
+                if (this.presctiption.material == "" || this.presctiption.dose == "" || this.presctiption.dose_unit == "") {
+                    this.show_modal = true;
                     this.modal_content = '沒有填入藥材名稱！';
                     return false;
                 }
-
                 let data = {
-                    material: this.material,
-                    dose: this.dose,
-                    dose_unit: this.dose_unit
+                    material: this.presctiption.material,
+                    dose: this.presctiption.dose,
+                    dose_unit: this.presctiption.dose_unit,
+                    id: this.presctiption.count
                 }
                 this.rows.push(data);
-                this.material = '';
-                this.dose = 1;
-                this.dose_unit = '錢';
+                this.presctiption.material = '';
+                this.presctiption.dose = 1;
+                this.presctiption.dose_unit = '錢';
+                this.presctiption.count++;
             },
             print: function () {
                 let that = this;
@@ -135,15 +137,37 @@
                 }, 1000);
             },
             close_modal: function () {
-                this.showModal = false;
+                this.show_modal = false;
+            },
+            del_item: function(item){
+                var rows = this.rows;
+                var confirm_del = confirm("是否確定要刪除" + item.material + "?");
+                if (confirm_del) {
+                    for (var i = 0; i < rows.length; i++) {
+                        if (item.id == rows[i]["id"]) {
+                            rows.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+            },
+            clear: function(){
+                this.presctiption.material = '';
+                this.presctiption.dose = 1;
+                this.presctiption.dose_unit = '錢';
+                this.presctiption.count = 0 ;
+                this.rows = [] ;
             }
         }
     }
 </script>
 
 <style scoped>
-    .result_area {
+    .direction {
         writing-mode: tb-rl;
+    }
+
+    .result_area {
         font-size: 18pt;
         font-family: 標楷體;
         margin: 10px;
@@ -159,9 +183,9 @@
     .value {
         position: relative;
         left: 10px;
-        writing-mode: lr;
         font-size: 12pt;
         font-family: 細明體;
+        writing-mode: lr;
     }
 
     #div_title {
@@ -171,10 +195,17 @@
     }
 
     .presctiption_title {
-        margin: 0 auto;
-        width: 220px;
+        text-align: center;
         color: red;
         font-family: 標楷體;
         font-size: 20pt;
+    }
+
+    .del_link{
+        cursor: pointer;
+    }
+
+    .pull-right{
+        float:right;
     }
 </style>
